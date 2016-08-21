@@ -1,0 +1,25 @@
+{
+  "name": "harubot",
+  "version": "0.0.1",
+  "description": "A small Discord bot made with love :3",
+  "main": "HaruBot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AmeryKr/HaruBot.git"
+  },
+  "author": "AmeryKr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AmeryKr/HaruBot/issues"
+  },
+  "homepage": "https://github.com/AmeryKr/HaruBot#readme",
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "discordie": "^0.7.6",
+    "nedb": "^1.8.0",
+    "require-directory": "^2.1.1"
+  }
+}
