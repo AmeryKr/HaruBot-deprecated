@@ -22,5 +22,8 @@
     "nedb": "^1.8.0",
     "require-directory": "^2.1.1"
   },
-  "test": "standard & eslint **"
+  "scripts": {
+    "test": "standard & eslint **",
+    "start": "node HaruBot.js"
+  }
 }
