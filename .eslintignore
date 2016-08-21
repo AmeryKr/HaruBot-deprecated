@@ -1,3 +1,6 @@
 *.json
 *.md
 *.txt
+LICENSE
+serverSettings
+permissions
