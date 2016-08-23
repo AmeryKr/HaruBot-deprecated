@@ -10,6 +10,7 @@ let cooldownHelper = require("./cooldown.js");
 
 /**
  * Handles message events for commands.
+ * @arg {Discordie} Client - the current Discordie Client
  * @arg {IMessage} msg - The message interface.
  */
 exports.messageHelper = function (Client, msg) {
@@ -79,7 +80,7 @@ exports.messageHelper = function (Client, msg) {
 						console.log(e);
 					}
 				} else {
-					msg.channel.sendMessage("Sorry, this command cannot be used in DMs.")
+					msg.channel.sendMessage("Sorry, this command cannot be used in DMs.");
 				}
 			}
 		}
