@@ -1,3 +1,4 @@
+"use strict";
 let commandsInModule = [];
 const Permissions = require("../../databases/helpers/permissions.js");
 

@@ -10,11 +10,13 @@ commandsInModule.ping = {
 	usage: '',
 	cooldown: 5, levelReq: 0,
 	exec: function (Client, msg, args) {
-		let currentDate = Date.now();
+		let msgDate = new Date(msg.timestamp);
+		
 		msg.reply('*pong!*').then((bm, error) => {
-			let delay = Date.now() - currentDate;
+			let botMessageDate = new Date(bm.timestamp);
+			let delay = new Date(botMessageDate - msgDate);
 
-			bm.edit(msg.author.mention + ', *pong!*\nReplied in: **' + delay + '**ms.');
+			bm.edit(msg.author.mention + ', *pong!*\nReplied in: **' + delay.getMilliseconds() + '**ms.');
 		});
 	}
 }
@@ -25,12 +27,13 @@ commandsInModule.info = {
 	usage: '',
 	cooldown: 5, levelReq: 0,
 	exec: function (Client, msg, args) {
-		let dateNow = Date.now();
-		let uptime = new Date(dateNow - Client.User.createdAt);
+		let uptime = new Date(null);
+		uptime.setSeconds(process.uptime());
+		let uptimeString = formatUptime(uptime);
 
 		msg.reply("hi! I'm **" + Client.User.username + "**!\nI'm currently in **" + Client.Guilds.length + "** servers, having tons of fun and splashing water on **" + Client.Users.length +
-		"** users >:D I'm also looking at **" + Client.Channels.length + "** channels! I've been up for " + uptime.getHours() + " hours, " + uptime.getMinutes() + " minutes and " +
-		uptime.getSeconds() + " seconds.");
+		"** users >:D I'm also looking at **" + Client.Channels.length + "** channels! I've been up for " + uptimeString + ".\n" +
+		"I'm also **open source**! My GitHub link: http://github.com/AmeryKr/HaruBot");
 	}
 }
 
@@ -40,19 +43,23 @@ commandsInModule.serverinfo = {
 	usage: '',
 	cooldown: 5, levelReq: 0,
 	exec: function (Client, msg, args) {
-		var infoArray = [];
+		let infoArray = [];
+		let afkChannel = (msg.guild.afk_channel) ? ('#' + msg.guild.afk_channel.name) : "none";
 
-		infoArray.push('Server Name:      \"' + msg.guild.name + `\"`);
-		infoArray.push('Server Owner:     ' + msg.guild.owner.username + '#' + msg.guild.owner.discriminator);
-		infoArray.push('Roles:            ' + msg.guild.roles.length);
-		infoArray.push('Text Channels:    ' + msg.guild.textChannels.length);
-		infoArray.push('Voice Channels:   ' + msg.guild.voiceChannels.length);
-		infoArray.push('Members:          ' + msg.guild.member_count);
-		infoArray.push('Default Channel:  ' + msg.guild.generalChannel.name);
-		infoArray.push('Created:          ' + msg.guild.createdAt.toUTCString());
-		infoArray.push('Icon URL:         \"' + msg.guild.iconURL + '\"');
+		infoArray.push('     Server Name: "' + msg.guild.name + '"');
+		infoArray.push('    Server Owner: "' + msg.guild.owner.username + '#' + msg.guild.owner.discriminator + '"');
+		infoArray.push('   Server Region: ' + msg.guild.region);
+		infoArray.push('Verification Lvl: ' + msg.guild.verification_level);
+		infoArray.push('           Roles: ' + msg.guild.roles.length);
+		infoArray.push('   Text Channels: ' + msg.guild.textChannels.length);
+		infoArray.push('  Voice Channels: ' + msg.guild.voiceChannels.length);
+		infoArray.push('         Members: ' + msg.guild.member_count);
+		infoArray.push(' Default Channel: #' + msg.guild.generalChannel.name);
+		infoArray.push('     AFK Timeout: ' + msg.guild.afk_timeout + ' seconds');
+		infoArray.push('     AFK Channel: ' + afkChannel);
+		infoArray.push('         Created: "' + msg.guild.createdAt.toUTCString() + '"');
 
-		msg.channel.sendMessage('```xl\n' + infoArray.join('\n') + '```');
+		msg.channel.sendMessage('```xl\n' + infoArray.join('\n') + '```\n' + msg.guild.iconURL);
 	}
 }
 
@@ -68,34 +75,45 @@ commandsInModule.userinfo = {
 		if (msg.mentions.length <= 0) {
 			if (args) {
 				if (/\d{17,18}/.test(args.split(" ")[0])) {
-					userObj = client.Users.getMember(msg.guild, args.split(" ")[0]);
+					userObj = Client.Users.getMember(msg.guild, args.split(" ")[0]);
+					userObj = userObj.memberOf(msg.guild);
 					isBot = userObj.bot ? "yes" : "no";
-					userJoined = correctDate(userObj.memberOf(msg.guild).joined_at);
+					userJoined = correctDate(userObj.joined_at);
 				} else {
 					msg.channel.sendMessage(':warning: The user ID provided is invalid.');
 					return;
 				}
 			} else {
-				userObj = msg.author;
-				isBot = userObj.bot ? "yes" : "no";
-				userJoined = correctDate(userObj.memberOf(msg.guild).joined_at);
+				userObj = msg.member;
+				isBot = msg.member.bot ? "yes" : "no";
+				userJoined = correctDate(msg.member.joined_at);
 			}
 		} else {
 			if (msg.mentions.length > 1) { msg.channel.sendMessage(':confounded: To prevent spam, please do 1 user at a time.'); return; }
-			userObj = msg.mentions[0];
+			userObj = msg.mentions[0].memberOf(msg.guild);
 			isBot = userObj.bot ? "yes" : "no";
-			userJoined = correctDate(userObj.memberOf(msg.guild).joined_at);
+			userJoined = correctDate(userObj.joined_at);
 		}
 
-		infoArray.push('     Username: ' + userObj.username + '#' + userObj.discriminator);
+		let rolesList = [];
+
+		userObj.roles.map(k => {
+			rolesList.push(k.name);
+		});
+
+		infoArray.push('     Username: "' + userObj.username + '#' + userObj.discriminator + '"');
+		infoArray.push('     Nickname: "' + userObj.nick + '"');
 		infoArray.push('           ID: ' + userObj.id);
 		infoArray.push('  Bot Account: ' + isBot);
-		infoArray.push('   Registered: ' + userObj.registeredAt.toUTCString());
-		infoArray.push('Joined Server: ' + userJoined);
+		infoArray.push('   Registered: "' + userObj.registeredAt.toUTCString() + '"');
+		infoArray.push('Joined Server: "' + userJoined + '"');
 		infoArray.push('       Status: ' + userObj.status);
-		infoArray.push('   Avatar URL: \"' + userObj.avatarURL + '\"');
+		infoArray.push('      Playing: ' + userObj.gameName);
+		infoArray.push('        Roles: "' + rolesList.join(", ") + '"');
 
-		msg.channel.sendMessage('```xl\n' + infoArray.join('\n') + '```\n' + userObj.avatarURL);
+		let avatarString = (userObj.avatarURL) ? ("\n" + userObj.avatarURL) : "";
+
+		msg.channel.sendMessage('```xl\n' + infoArray.join('\n') + '```' + avatarString);
 	}
 }
 
@@ -104,7 +122,7 @@ commandsInModule.eval = {
 	help: 'Runs arbitrary JS code and gives back the results.',
 	usage: '[code]',
 	cooldown: 0, levelReq: 'owner',
-	exec: function (client, msg, args) {
+	exec: function (Client, msg, args) {
 		var result;
 
 		try {
@@ -147,4 +165,21 @@ function correctDate (stringDate) {
 	var date = new Date(stringDate);
 	var dateUNIX = date.toUTCString();
 	return dateUNIX;
+}
+
+function formatUptime (uptime) {
+	let result = "";
+
+	let seconds = uptime.getUTCSeconds();
+	let minutes = uptime.getUTCMinutes();
+	let hours = uptime.getUTCHours();
+	let days = parseInt(uptime.getUTCHours() / 24);
+	hours -= days * 24;
+
+	result += (days > 0) ? ("**" + days + "** days ") : "";
+	result += (hours > 0) ? ("**" + hours + "** hours ") : "";
+	result += (minutes > 0) ? ("**" + minutes + "** minutes ") : "";
+	result += (seconds > 0) ? ("**" + seconds + "** seconds ") : "";
+
+	return result;
 }

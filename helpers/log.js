@@ -47,3 +47,16 @@ exports.ownerCommand = function (server, user, command, args) {
 		'Additional Arguments: ' + chalk.bold(args) + '\n'
 	);
 }
+
+/**
+ * Logs help usage to the console
+ * @arg {IMessage} msg - Message interface
+ * @arg {String} args - Additional arguments
+ */
+exports.logHelp = function (msg, args) {
+	console.log(
+		chalk.bgMagenta(' ' + msg.guild.name + ' ') + ' > ' + chalk.magenta(msg.author) + '\n' +
+		chalk.bold.green('Help Requested') + '\n' +
+		'Additional Arguments: ' + chalk.bold(args) + '\n'
+	);
+}

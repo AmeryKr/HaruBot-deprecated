@@ -26,6 +26,7 @@ exports.messageHelper = function (Client, msg) {
 		let args = msg.content.substr(prefix.length + cmdText.length + 1);
 
 		if (cmdText === "help") {
+			logHelper.logHelp(msg, args);
 			helpHelper.helpHandler(msg, args, commands);
 		}
 
@@ -37,6 +38,7 @@ exports.messageHelper = function (Client, msg) {
 					logHelper.ownerCommand(msg.guild.name, msg.author.username, cmdText, args);
 					try {
 						command.exec(Client, msg, args);
+						return;
 					} catch (e) {
 						msg.channel.sendMessage(":interrobang: There was an error while executing that command. Check console for details.");
 						console.log(e);
