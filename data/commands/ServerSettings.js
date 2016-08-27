@@ -79,7 +79,7 @@ commandsInModule.log = {
 
 		ServerSettings.updateLogging(msg.guild, whatToDo, logChannel).then(r => {
 			if (r === 'Ok') {
-				msg.channel.sendMessage(":white_check_mark: Greeting has been updated!");
+				msg.channel.sendMessage(":white_check_mark: Logging has been updated!");
 			}
 		}).catch(e => {
 			console.log(e);

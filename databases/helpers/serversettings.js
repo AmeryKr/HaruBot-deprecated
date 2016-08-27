@@ -28,6 +28,58 @@ exports.checkForCustomPrefix = function (msg) {
 }
 
 /**
+ * Checks for the server's custom member greeting.
+ * @arg {IGuild} guild - Guild interface
+ */
+exports.checkForGreeting = function (guild) {
+	return new Promise ((resolve, reject) => {
+		serverSettings.find({ _id: guild.id }, (err, docs) => {
+			if (err) {
+				console.log(err);
+				return reject(err);
+			}
+
+			if (docs.length > 0) {
+				if (docs[0].greetingEnabled && docs[0].greeting !== "") {
+					return resolve(docs[0].greeting);
+				} else if (docs[0].greetingEnabled) {
+					return resolve("DEFAULT");
+				} else {
+					return reject();
+				}
+			} else {
+				return reject();
+			}
+		});
+	});
+}
+
+/**
+ * Check for log status and channel
+ * @arg {IGuild} guild - Guild interface
+ */
+exports.checkLogging = function (guild) {
+	return new Promise ((resolve, reject) => {
+		serverSettings.find({ _id: guild.id }, (err, docs) => {
+			if (err) {
+				console.log(err);
+				return reject(err);
+			}
+
+			if (docs.length > 0) {
+				if (docs[0].logEnabled && docs[0].logChannel !== "") {
+					return resolve(docs[0].logChannel);
+				} else {
+					return resolve("DISABLED");
+				}
+			} else {
+				return resolve("DISABLED");
+			}
+		});
+	});
+}
+
+/**
  * Updates the status for a custom prefix on a server
  * @arg {IGuild} guild - Guild interface
  * @arg {String} whatToDo - Tells the function what to execute
@@ -240,6 +292,19 @@ exports.initializeServerSettings = function (guild) {
 			if (newDoc) {
 				return resolve('Ok');
 			}
+		});
+	});
+}
+
+/**
+ * Deletes the database entry for a specific guild when it becomes unavailable or is deleted
+ * @arg {String} guildID - ID of the unavailable guild
+ */
+exports.deleteServerSettings = function (guildID) {
+	return new Promise ((resolve, reject) => {
+		serverSettings.remove({ _id: guildID }, {}, function (err) {
+			if (err) return reject(err);
+			return resolve('Ok');
 		});
 	});
 }

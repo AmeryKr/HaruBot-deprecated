@@ -197,3 +197,16 @@ exports.initializePermissions = function (guild) {
 		});
 	});
 }
+
+/**
+ * Deletes a guild's database entry after it becomes unavailable or is deleted
+ * @arg {String} guildID - ID of the guild that became unavailable
+ */
+exports.deletePermissions = function (guildID) {
+	return new Promise ((resolve, reject) => {
+		permissions.remove({ _id: guildID }, {}, function (err) {
+			if (err) return reject(err);
+			return resolve('Ok');
+		});
+	});
+}
