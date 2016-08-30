@@ -45,6 +45,7 @@ exports.messageHelper = function (Client, msg) {
 					}
 				} else {
 					msg.channel.sendMessage(":no_entry: Sorry, this command is only for the bot owner.");
+					return;
 				}
 			}
 			

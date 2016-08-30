@@ -48,9 +48,24 @@ exports.helpHandler = function (msg, args, commands) {
 			}
 		}
 
+		let helpString = helpArray.join('\n');
+
+		if (helpString.length > 1990) {
+			let searchesIndex = helpString.indexOf('[Searches]:');
+			let hsP1 = helpString.substring(0, searchesIndex - 1);
+			let hsP2 = helpString.substring(searchesIndex);
+			
+			msg.author.openDM().then(dmchannel => {
+				dmchannel.sendMessage('```md\n' + hsP1 + '```');
+				dmchannel.sendMessage('```md\n' + hsP2 + '```');
+			});
+
+			return;
+		}
+
 		msg.author.openDM().then(dmchannel => {
 			dmchannel.sendMessage('```md\n' + helpArray.join('\n') + '```');
-		})
+		});
 	} else {
 		if (!commands[args]) {
 			msg.channel.sendMessage(':warning: Command `' + args + '` is invalid.');

@@ -4,6 +4,7 @@ let unirest = require('unirest');
 
 const auth = require("../../auth.json");
 const pats = require("../lists/pats.js").pats;
+const Permissions = require("../../databases/helpers/permissions.js");
 
 commandsInModule.pat = {
 	name: 'pat', module: 'Fun',
@@ -83,6 +84,79 @@ commandsInModule.ud = {
 				msg.channel.sendMessage(":warning: Something went wrong while trying to get the definition, or it doesn't exist!");
 			}
 		});
+	}
+}
+
+commandsInModule.roll = {
+	name: 'roll', module: 'Fun',
+	help: 'Roll a dice! If no dice type is specified, the default is 1d6.',
+	usage: '[(number of rolls)d(sides of the dice)]',
+	cooldown: 10, levelReq: 0,
+	exec: function (Client, msg, args) {
+		let arg = args.split(" ");
+		let dice, urlReq, object;
+
+		if (!/\d+d\d+/.test(arg[0])) {
+			dice = "1d6";
+		} else {
+			dice = arg[0];
+		}
+
+		urlReq = `https://rolz.org/api/?${dice}.json`
+
+		request(urlReq, {}, function(error, response, body) {
+			if (error) {
+				console.log(error);
+				msg.channel.sendMessage(":warning: There was an error while processing that request. Details:\n```xl\n" + error + "```");
+			}
+
+			if (response.statusCode === 200) {
+				object = JSON.parse(body);
+
+				msg.channel.sendMessage(":game_die: You rolled a **" + object.result + "**!\n__Details__:" + object.details);
+			}
+		});
+	}
+}
+
+commandsInModule.russianroulette = {
+	name: 'russianroulette', module: 'Fun',
+	help: 'Play russian roulette! If you lose, you get muted for 1 to 5 minutes, so be careful.',
+	usage: '',
+	cooldown: 120, levelReq: 0,
+	exec: function (Client, msg, args) {
+		if (!Client.User.permissionsFor(msg.guild).General.MANAGE_ROLES) {
+			msg.channel.sendMessage(':sob: I do not have permission to manage roles in this server!');
+			return;
+		}
+
+		let time = (Math.floor(Math.random() * 4) + 1) * 60 * 1000;
+		let chance = parseInt(Math.floor(Math.random() * 2));
+
+		console.log(chance);
+
+		if (chance === 1) {
+			Permissions.getMuteRole(msg.guild).then(r => {
+				let muteRole = msg.guild.roles.find(k => k.id === r);
+				
+				if (!muteRole) {
+					msg.channel.sendMessage(':warning: No mute role has been set! Set it with `setmute [Role Name/@Role]`');
+					return;
+				}
+
+				let member = msg.author.memberOf(msg.guild);
+
+				member.assignRole(muteRole).then(() => {
+					msg.channel.sendMessage(':gun: Member `' + member.username + '#' + member.discriminator + '` got shot while playing Russian Roulette! (muted for: **' + (time / 1000 / 60) + '** minutes).')
+				}).catch(er => {
+					console.log(er);
+				});
+
+				setTimeout(() => {member.unassignRole(muteRole)}, time);
+			});
+		} else {
+			msg.channel.sendMessage(":relieved: The odds were with you this time!");
+		}
 	}
 }
 

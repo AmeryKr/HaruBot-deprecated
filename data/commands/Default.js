@@ -108,7 +108,7 @@ commandsInModule.userinfo = {
 		infoArray.push('   Registered: "' + userObj.registeredAt.toUTCString() + '"');
 		infoArray.push('Joined Server: "' + userJoined + '"');
 		infoArray.push('       Status: ' + userObj.status);
-		infoArray.push('      Playing: ' + userObj.gameName);
+		infoArray.push('      Playing: "' + userObj.gameName + '"');
 		infoArray.push('        Roles: "' + rolesList.join(", ") + '"');
 
 		let avatarString = (userObj.avatarURL) ? ("\n" + userObj.avatarURL) : "";
