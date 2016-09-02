@@ -48,7 +48,7 @@ exports.messageHelper = function (Client, msg) {
 					return;
 				}
 			}
-			
+
 			if (!msg.isPrivate) {
 				cooldownHelper.checkCooldown(command, msg.guild.id, msg.author.id).then(time => {
 					if (time === true) {
@@ -69,10 +69,10 @@ exports.messageHelper = function (Client, msg) {
 							console.log(err);
 						});
 					} else {
-						msg.channel.sendMessage(":hand::skin-tone-1: That command is on cooldown for **" + time + "** more seconds!");
+						msg.channel.sendMessage(":raised_hand::skin-tone-1: That command is on cooldown for **" + time + "** more seconds!");
 						return;
 					}
-					
+
 				});
 			} else {
 				if (command.hasOwnProperty("DM") && command.DM) {
