@@ -63,6 +63,7 @@ exports.messageHelper = function (Client, msg) {
 								}
 							} else {
 								msg.channel.sendMessage(":no_entry_sign: Sorry, you don't have enough permission to run this command.");
+								cooldownHelper.resetCooldown(command.name, msg.guild.id, msg.author.id);
 							}
 						}).catch(err => {
 							msg.channel.sendMessage(":interrobang: There was an error while retrieving permissions. Error:\n```xl\n" + err + "```");

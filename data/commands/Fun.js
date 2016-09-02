@@ -7,6 +7,7 @@ const auth = require("../../auth.json");
 const pats = require("../lists/pats.js").pats;
 const Permissions = require("../../databases/helpers/permissions.js");
 const ServerSettings = require("../../databases/helpers/serversettings.js");
+const cooldowns = require("../../helpers/cooldown.js");
 
 commandsInModule.pat = {
 	name: 'pat', module: 'Fun',
@@ -170,54 +171,71 @@ commandsInModule.color = {
 			if (r === "ENABLED") {
 				if (!/#[A-F0-9]{6}/i.test(args) || args.length > 7) {
 					msg.reply("invalid color hex! Precede the code by a `#`. Only numbers and letters A through F are allowed. Example: `#B4A90F`");
+					cooldowns.resetCooldown("color", msg.guild.id, msg.author.id);
 					return;
 				} else if (!args) {
 					msg.reply("you did not specify a color!");
+					cooldowns.resetCooldown("color", msg.guild.id, msg.author.id);
 					return;
 				}
 
 				if (!Client.User.permissionsFor(msg.guild).General.MANAGE_ROLES) {
 					msg.channel.sendMessage(':sob: I do not have permission to manage roles in this server!');
+					cooldowns.resetCooldown("color", msg.guild.id, msg.author.id);
 					return;
 				}
 
-				let findColorRole = msg.guild.roles.find(k => k.name === args.toUpperCase());
+				/* Make it so that it deletes the previous role */
+				let userRoles = msg.member.roles;
 
-				if (findColorRole) {
-					msg.member.assignRole(findColorRole).then(() => {
-						msg.channel.sendMessage(":ok_hand::skin-tone-1: Your color has been set to `" + args.toUpperCase() + "`. Note: if the color doesn't show up, make sure that there are no other roles with colors on top of your color role.");
-					}).catch(e => {
-						msg.channel.sendMessage(':interrobang: Woah! Something went wrong while running that command!. Stack:\n```xl\n' + e.stack + '```');
-					});
-				} else {
-					msg.guild.createRole().then(newRole => {
-						let rolePerms = newRole.permissions;
-
-						/* Empty role permissions */
-						for (var x in rolePerms.General) {
-							rolePerms.General[x] = false;
-						}
-						for (var x in rolePerms.Text) {
-							rolePerms.Text[x] = false;
-						}
-						for (var x in rolePerms.Voice) {
-							rolePerms.Voice[x] = false;
-						}
-
-						let name = args.toUpperCase();
-						let color = parseInt("0x" + args.replace(/#/, ""));
-
-						newRole.commit(name, color, false, false).then(() => {}).catch(e => {
-							msg.channel.sendMessage(':interrobang: Woah! Something went wrong while running that command!. Stack:\n```xl\n' + e.stack + '```');
+				for (let x of userRoles) {
+					if (/#[A-F0-9]{6}/.test(x.name)) {
+						msg.member.unassignRole(x).then(() => {
+							console.log("Deleted member from color role");
 						});
+					}
+				}
 
-						msg.member.assignRole(newRole).then(() => {
+				setTimeout(() => {
+					/* See if the color role already exists */
+					let findColorRole = msg.guild.roles.find(k => k.name === args.toUpperCase());
+
+					if (findColorRole) {
+						msg.member.assignRole(findColorRole).then(() => {
 							msg.channel.sendMessage(":ok_hand::skin-tone-1: Your color has been set to `" + args.toUpperCase() + "`. Note: if the color doesn't show up, make sure that there are no other roles with colors on top of your color role.");
 						}).catch(e => {
 							msg.channel.sendMessage(':interrobang: Woah! Something went wrong while running that command!. Stack:\n```xl\n' + e.stack + '```');
 						});
-					});
-				}
+					} else { /* If there was no role already made, we create it */
+						msg.guild.createRole().then(newRole => {
+							let rolePerms = newRole.permissions;
+
+							/* Empty role permissions */
+							for (var x in rolePerms.General) {
+								rolePerms.General[x] = false;
+							}
+							for (var x in rolePerms.Text) {
+								rolePerms.Text[x] = false;
+							}
+							for (var x in rolePerms.Voice) {
+								rolePerms.Voice[x] = false;
+							}
+
+							let name = args.toUpperCase();
+							let color = parseInt("0x" + args.replace(/#/, ""));
+
+							newRole.commit(name, color, false, false).then(() => {}).catch(e => {
+								msg.channel.sendMessage(':interrobang: Woah! Something went wrong while running that command!. Stack:\n```xl\n' + e.stack + '```');
+							});
+
+							msg.member.assignRole(newRole).then(() => {
+								msg.channel.sendMessage(":ok_hand::skin-tone-1: Your color has been set to `" + args.toUpperCase() + "`. Note: if the color doesn't show up, make sure that there are no other roles with colors on top of your color role.");
+							}).catch(e => {
+								msg.channel.sendMessage(':interrobang: Woah! Something went wrong while running that command!. Stack:\n```xl\n' + e.stack + '```');
+							});
+						});
+					}
+				}, 1000);
 			} else if (r === "DISABLED") {
 				msg.channel.sendMessage(":raised_hand::skin-tone-1: Color roles are disabled on this server!");
 			}

@@ -19,24 +19,39 @@ exports.checkCooldown = function (cmd, server, user) {
 		if (cmd.hasOwnProperty('cooldown')) {
 			if (letoc.hasOwnProperty(server)) {
 				if (letoc[server].hasOwnProperty(cmd.name)) {
-					var timeNow = new Date();
-					var lastExecutedTime = new Date(letoc[server][cmd.name]);
+					if (letoc[server][cmd.name].hasOwnProperty(user)) {
+						var timeNow = new Date();
+						var lastExecutedTime = new Date(letoc[server][cmd.name][user]);
 
-					lastExecutedTime.setSeconds(lastExecutedTime.getSeconds() + cmd.cooldown);
+						lastExecutedTime.setSeconds(lastExecutedTime.getSeconds() + cmd.cooldown);
 
-					if (timeNow < lastExecutedTime) {
-						result = (lastExecutedTime - timeNow) / 1000;
+						if (timeNow < lastExecutedTime) {
+							result = (lastExecutedTime - timeNow) / 1000;
+						} else {
+							letoc[server][cmd.name][user] = new Date();
+						}
 					} else {
-						letoc[server][cmd.name] = new Date();
+						letoc[server][cmd.name][user] = new Date();
 					}
 				} else {
-					letoc[server][cmd.name] = new Date();
+					letoc[server][cmd.name] = {};
 				}
 			} else {
 				letoc[server] = {};
-				letoc[server][cmd.name] = new Date();
+				letoc[server][cmd.name] = {};
+				letoc[server][cmd.name][user] = new Date();
 			}
 		}
 		return resolve(result);
 	});
+}
+
+/**
+ * Resets cooldown on invalid command usage.
+ * @arg {String} cmd - Command name
+ * @arg {String} server - Server ID
+ * @arg {String} user - User ID
+ */
+exports.resetCooldown = function (cmd, server, user) {
+	letoc[server][cmd][user] = 0;
 }
