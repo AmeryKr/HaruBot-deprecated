@@ -185,7 +185,7 @@ commandsInModule.color = {
 
 				if (findColorRole) {
 					msg.member.assignRole(findColorRole).then(() => {
-						msg.channel.sendMessage(":ok_hand::skin-tone-1: Your color has been set to `" + args.toUpperCase() + "`. Note: if the color doesn't show up, that means the role has to be moved up in the list!");
+						msg.channel.sendMessage(":ok_hand::skin-tone-1: Your color has been set to `" + args.toUpperCase() + "`. Note: if the color doesn't show up, make sure that there are no other roles with colors on top of your color role.");
 					}).catch(e => {
 						msg.channel.sendMessage(':interrobang: Woah! Something went wrong while running that command!. Stack:\n```xl\n' + e.stack + '```');
 					});
@@ -212,7 +212,7 @@ commandsInModule.color = {
 						});
 
 						msg.member.assignRole(newRole).then(() => {
-							msg.channel.sendMessage(":ok_hand::skin-tone-1: Your color has been set to `" + args.toUpperCase() + "`. Note: if the color doesn't show up, that means the role has to be moved up in the list!");
+							msg.channel.sendMessage(":ok_hand::skin-tone-1: Your color has been set to `" + args.toUpperCase() + "`. Note: if the color doesn't show up, make sure that there are no other roles with colors on top of your color role.");
 						}).catch(e => {
 							msg.channel.sendMessage(':interrobang: Woah! Something went wrong while running that command!. Stack:\n```xl\n' + e.stack + '```');
 						});
