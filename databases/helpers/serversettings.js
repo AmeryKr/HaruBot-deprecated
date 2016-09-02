@@ -79,6 +79,53 @@ exports.checkLogging = function (guild) {
 	});
 }
 
+
+/**
+ * Checks if colors are enabled
+ * @arg {IGuild} guild - Guild interface
+ */
+exports.checkColors = function (guild) {
+	return new Promise ((resolve, reject) => {
+		serverSettings.find({ _id: guild.id }, (err, docs) => {
+			if (err) {
+				console.log(err);
+				return reject(err);
+			}
+
+			if (docs.length > 0) {
+				if (docs[0].colorsEnabled) {
+					return resolve("ENABLED");
+				} else {
+					return resolve("DISABLED");
+				}
+			}
+		});
+	});
+}
+
+/**
+ * Enables/disables custom colors
+ * @arg {IGuild} guild - Guild interface
+ * @arg {String} whatToDo - Either enable or disable
+ */
+exports.updateColors = function (guild, whatToDo) {
+	return new Promise ((resolve, reject) => {
+		let boolV = ((whatToDo === "enable") ? true : false);
+
+		serverSettings.update({ _id: guild.id }, {
+			$set: { colorsEnabled: boolV }
+		}, function (err, docs) {
+			if (err) {
+				console.log(err);
+				return reject(err);
+			}
+			if (docs) {
+				return resolve('Ok');
+			}
+		});
+	});
+}
+
 /**
  * Updates the status for a custom prefix on a server
  * @arg {IGuild} guild - Guild interface
@@ -265,6 +312,7 @@ exports.updateUserIgnore = function (guild, whatToDo, userID) {
 	});
 }
 
+
 /**
  * Initializes the serversettings database for a determined server.
  * @arg {IGuild} guild - Guild interface
@@ -281,6 +329,7 @@ exports.initializeServerSettings = function (guild) {
 			logChannel: "",
 			ignoredChannels: ["ID"],
 			ignoredUsers: ["ID"],
+			colorsEnabled: false
 		}
 
 		serverSettings.insert(doc, (err, newDoc) => {
