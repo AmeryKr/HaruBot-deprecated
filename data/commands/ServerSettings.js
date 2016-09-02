@@ -90,7 +90,7 @@ commandsInModule.log = {
 
 commandsInModule.ignore = {
 	name: 'ignore', module: 'Server Settings',
-	help: 'WARNING: NOT IMPLEMENTED! Makes the bot ignore the channel in which the command was typed in, or a specific user with an @mention',
+	help: 'Makes the bot ignore the channel in which the command was typed in, or a specific user with an @mention',
 	usage: '(@user) - Optional. If no user is mentioned, the current channel will be ignored',
 	cooldown: 5, levelReq: 3,
 	exec: function (Client, msg, args) {
@@ -117,28 +117,6 @@ commandsInModule.ignore = {
 		} else {
 			msg.channel.sendMessage(":warning: Only one user mention at a time is allowed.");
 		}
-	}
-}
-
-commandsInModule.setcolors = {
-	name: 'setcolors', module: 'Server Settings',
-	help: 'Enable or disable custom color roles on this server.',
-	usage: '[enable/disable]',
-	cooldown: 5, levelReq: 3,
-	exec: function (Client, msg, args) {
-		if (args !== "enable" && args !== "disable") {
-			msg.reply("valid arguments for this command are: `enable` or `disable`.");
-			return;
-		}
-
-		ServerSettings.updateColors(msg.guild, args).then(r => {
-			if (r === 'Ok') {
-				msg.channel.sendMessage(":white_check_mark: Self-assignable color roles are now **" + args + "d**.");
-			}
-		}).catch(e => {
-			console.log(e);
-			msg.channel.sendMessage(":interrobang: An error has occurred while trying to run this command! Error:```xl\n" + e + "```");
-		});
 	}
 }
 

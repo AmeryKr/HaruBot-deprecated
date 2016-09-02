@@ -12,7 +12,7 @@ commandsInModule.prune = {
 			msg.channel.sendMessage(':pensive: You don\'t have permission to delete messages on this server!');
 			return;
 		}
-
+		
 		if (!client.User.permissionsFor(msg.guild).Text.MANAGE_MESSAGES) {
 			msg.channel.sendMessage(':sob: I don\'t have permission to delete messages on this server!');
 			return;
@@ -42,7 +42,7 @@ commandsInModule.clean = {
 			msg.channel.sendMessage(':pensive: You don\'t have permission to delete messages on this server!');
 			return;
 		}
-
+		
 		if (!client.User.permissionsFor(msg.guild).Text.MANAGE_MESSAGES) {
 			msg.channel.sendMessage(':sob: I don\'t have permission to delete messages on this server!');
 			return;
@@ -118,7 +118,7 @@ commandsInModule.mute = {
 
 		Permissions.getMuteRole(msg.guild).then(r => {
 			let muteRole = msg.guild.roles.find(k => k.id === r);
-
+			
 			if (!muteRole) {
 				msg.channel.sendMessage(':warning: No mute role has been set! Set it with `setmute [Role Name/@Role]`');
 				return;
@@ -139,80 +139,6 @@ commandsInModule.mute = {
 			console.log(chalk.bgRed(' DB CHECK ERROR ') + '\n' + e);
 			msg.channel.sendMessage(':interrobang: Woah! Something went wrong while fetching the mute role from the database!. Stack:\n```xl\n' + e.stack + '```');
 		});
-	}
-}
-
-commandsInModule.kick = {
-	name: 'kick', module: 'Moderation',
-	help: 'Kicks a user or a set of users.',
-	usage: '[@user1] [@user2]...',
-	cooldown: 5, levelReq: 3,
-	exec: function (Client, msg, args) {
-		if (!msg.author.permissionsFor(msg.guild).General.KICK_MEMBERS) {
-			msg.reply(':pensive: You do not have permission to kick members in this server!');
-			return;
-		}
-
-		if (!Client.User.permissionsFor(msg.guild).General.KICK_MEMBERS) {
-			msg.reply(':sob: I do not have permission to kick members in this server!');
-			return;
-		}
-
-		if (msg.mentions.length === 0) {
-			msg.reply('you need to mention the member/s you want to kick (@mention).');
-			return;
-		}
-
-		msg.mentions.map(k => {
-			let guildMember = k.memberOf(msg.guild);
-
-			guildMember.kick().then(() => {
-				msg.channel.sendMessage(":boot: User **" + k.username + "#" + k.discriminator + " has been kicked from the server.");
-			}).catch((e) => {
-				msg.channel.sendMessage(":warning: Failed to kick **" + k.username + "** (" + k.id + "). Error:\n```xl\n" + e.stack + "```");
-				console.log(e);
-			});
-		});
-	}
-}
-
-commandsInModule.ban = {
-	name: 'ban', module: 'Moderation',
-	help: 'Bans a user or a set of users. At the end of the mentions you can specify the days to delete messages.',
-	usage: '[@user1] [@user2]... [days (0, 1, or 7)]',
-	cooldown: 5, levelReq: 3,
-	exec: function (Client, msg, args) {
-		if (!msg.author.permissionsFor(msg.guild).General.BAN_MEMBERS) {
-			msg.reply(':pensive: You do not have permission to ban members in this server!');
-			return;
-		}
-
-		if (!Client.User.permissionsFor(msg.guild).General.BAN_MEMBERS) {
-			msg.reply(':sob: I do not have permission to ban members in this server!');
-			return;
-		}
-
-		if (msg.mentions.length === 0) {
-			msg.reply('you need to mention the member/s you want to ban (@mention).');
-			return;
-		}
-
-		let messageDelete = args.split(" ")[msg.mentions.length] || 0;
-
-		if (parseInt(messageDelete) === 0 || parseInt(messageDelete) === 1 || parseInt(messageDelete) === 7) {
-			msg.mentions.map(k => {
-				let guildMember = k.memberOf(msg.guild);
-
-				guildMember.ban(messageDelete).then(() => {
-					msg.channel.sendMessage(":hammer: User **" + k.username + "#" + k.discriminator + " has been banned from the server.");
-				}).catch((e) => {
-					msg.channel.sendMessage(":warning: Failed to ban **" + k.username + "** (" + k.id + "). Error:\n```xl\n" + e.stack + "```");
-					console.log(e);
-				});
-			});
-		} else {
-			msg.reply("last parameter has to be either 0, 1 or 7.");
-		}
 	}
 }
 

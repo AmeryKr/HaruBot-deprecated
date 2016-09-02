@@ -1,12 +1,10 @@
 "use strict";
 let commandsInModule = [];
 let unirest = require('unirest');
-let request = require('request');
 
 const auth = require("../../auth.json");
 const pats = require("../lists/pats.js").pats;
 const Permissions = require("../../databases/helpers/permissions.js");
-const ServerSettings = require("../../databases/helpers/serversettings.js");
 
 commandsInModule.pat = {
 	name: 'pat', module: 'Fun',
@@ -79,7 +77,7 @@ commandsInModule.ud = {
 					msgArray.push("__**Author**__: " + topResult.author);
 					msgArray.push("__**Thumbs Up**__: " + topResult.thumbs_up + " | __Thumbs Down__: " + topResult.thumbs_down);
 					msgArray.push("<" + topResult.permalink + ">");
-
+					
 					msg.channel.sendMessage(msgArray.join("\n"));
 				}
 			} else {
@@ -135,10 +133,12 @@ commandsInModule.russianroulette = {
 		let time = (Math.floor(Math.random() * 4) + 1) * 60 * 1000;
 		let chance = parseInt(Math.floor(Math.random() * 2));
 
+		console.log(chance);
+
 		if (chance === 1) {
 			Permissions.getMuteRole(msg.guild).then(r => {
 				let muteRole = msg.guild.roles.find(k => k.id === r);
-
+				
 				if (!muteRole) {
 					msg.channel.sendMessage(':warning: No mute role has been set! Set it with `setmute [Role Name/@Role]`');
 					return;
@@ -157,73 +157,6 @@ commandsInModule.russianroulette = {
 		} else {
 			msg.channel.sendMessage(":relieved: The odds were with you this time!");
 		}
-	}
-}
-
-commandsInModule.color = {
-	name: 'color', module: 'Fun',
-	help: 'Set a custom color role for yourself!',
-	usage: '[color hex]',
-	cooldown: 300, levelReq: 1,
-	exec: function (Client, msg, args) {
-		ServerSettings.checkColors(msg.guild).then(r => {
-			if (r === "ENABLED") {
-				if (!/#[A-F0-9]{6}/i.test(args) || args.length > 7) {
-					msg.reply("invalid color hex! Precede the code by a `#`. Only numbers and letters A through F are allowed. Example: `#B4A90F`");
-					return;
-				} else if (!args) {
-					msg.reply("you did not specify a color!");
-					return;
-				}
-
-				if (!Client.User.permissionsFor(msg.guild).General.MANAGE_ROLES) {
-					msg.channel.sendMessage(':sob: I do not have permission to manage roles in this server!');
-					return;
-				}
-
-				let findColorRole = msg.guild.roles.find(k => k.name === args.toUpperCase());
-
-				if (findColorRole) {
-					msg.member.assignRole(findColorRole).then(() => {
-						msg.channel.sendMessage(":ok_hand::skin-tone-1: Your color has been set to `" + args.toUpperCase() + "`. Note: if the color doesn't show up, that means the role has to be moved up in the list!");
-					}).catch(e => {
-						msg.channel.sendMessage(':interrobang: Woah! Something went wrong while running that command!. Stack:\n```xl\n' + e.stack + '```');
-					});
-				} else {
-					msg.guild.createRole().then(newRole => {
-						let rolePerms = newRole.permissions;
-
-						/* Empty role permissions */
-						for (var x in rolePerms.General) {
-							rolePerms.General[x] = false;
-						}
-						for (var x in rolePerms.Text) {
-							rolePerms.Text[x] = false;
-						}
-						for (var x in rolePerms.Voice) {
-							rolePerms.Voice[x] = false;
-						}
-
-						let name = args.toUpperCase();
-						let color = parseInt("0x" + args.replace(/#/, ""));
-
-						newRole.commit(name, color, false, false).then(() => {}).catch(e => {
-							msg.channel.sendMessage(':interrobang: Woah! Something went wrong while running that command!. Stack:\n```xl\n' + e.stack + '```');
-						});
-
-						msg.member.assignRole(newRole).then(() => {
-							msg.channel.sendMessage(":ok_hand::skin-tone-1: Your color has been set to `" + args.toUpperCase() + "`. Note: if the color doesn't show up, that means the role has to be moved up in the list!");
-						}).catch(e => {
-							msg.channel.sendMessage(':interrobang: Woah! Something went wrong while running that command!. Stack:\n```xl\n' + e.stack + '```');
-						});
-					});
-				}
-			} else if (r === "DISABLED") {
-				msg.channel.sendMessage(":raised_hand::skin-tone-1: Color roles are disabled on this server!");
-			}
-		}).catch(e => {
-			console.log(er);
-		})
 	}
 }
 

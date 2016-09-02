@@ -44,11 +44,11 @@ commandsInModule.anime = {
 						summary = result.anime.entry[0].synopsis.toString(),
 						image = result.anime.entry[0].image,
 						id = result.anime.entry[0].id;
-
+					
 					summary = entities.decodeHTML(summary.replace(/<br \/>/g, "").replace(/\[(.{1,10})\]/g, " ")
 														 .replace(/\r?\n|\r/g, " ").replace(/\[(i|\/i)\]/g, "*")
 														 .replace(/\[(b|\/b)\]/g, "**"));
-
+					
 					if (summary.length > 300) {
 						summary = summary.substring(0, 300) + "...";
 					}
@@ -62,12 +62,10 @@ commandsInModule.anime = {
 					"      Type: \"" + type + "\"\n" +
 					"    Status: \"" + status + "\"\n" +
 					"  Episodes: " + episodes + "\n" +
-					"Mean Score: " + score + "\n" +
+					"Mean Score: " + score + "\n" + 
 					"   Summary: \'" + summary + "\'```\n" +
 					"<http://www.myanimelist.net/anime/" + id + ">\n" + image);
 				});
-			} else {
-				msg.channel.sendMessage(":warning: The anime `" + suffix.replace(/\+/g, " ") + "` was not found.");
 			}
 		});
 	}
@@ -112,11 +110,11 @@ commandsInModule.manga = {
 						summary = result.manga.entry[0].synopsis.toString(),
 						image = result.manga.entry[0].image,
 						id = result.manga.entry[0].id;
-
+					
 					summary = entities.decodeHTML(summary.replace(/<br \/>/g, "").replace(/\[(.{1,10})\]/g, " ")
 														 .replace(/\r?\n|\r/g, " ").replace(/\[(i|\/i)\]/g, "*")
 														 .replace(/\[(b|\/b)\]/g, "**"));
-
+					
 					if (summary.length > 300) {
 						summary = summary.substring(0, 300) + "...";
 					}
@@ -131,12 +129,10 @@ commandsInModule.manga = {
 					"    Status: \"" + status + "\"\n" +
 					"  Chapters: " + chapters + "\n" +
 					"   Volumes: " + volumes + "\n" +
-					"Mean Score: " + score + "\n" +
+					"Mean Score: " + score + "\n" + 
 					"   Summary: \'" + summary + "\'```\n" +
 					"<http://www.myanimelist.net/manga/" + id + ">\n" + image);
 				});
-			} else {
-				msg.channel.sendMessage(":warning: The manga `" + suffix.replace(/\+/g, " ") + "` was not found.");
 			}
 		});
 	}
