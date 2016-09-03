@@ -10,6 +10,7 @@ const authToken = require("./auth.json").token;
  */
 const logHelper = require("./helpers/log.js");
 const messageHelper = require("./helpers/message.js");
+const eventsHelper = require("./helpers/events.js");
 const guildEventsHelper = require("./helpers/guildevents.js");
 
 /* Events constant */
@@ -73,6 +74,10 @@ Client.Dispatcher.on(Events.GUILD_BAN_REMOVE, e => {
  * Update server count on Abal's website
  */
 if (auth.abalToken) {
+	/* Temporary, for testing */
+	setTimeout(() => {
+		eventsHelper.updateServerCount(Client.User.id, Client.Guilds.length, auth.abalToken);
+	}, 10000);
 	setInterval(() => {
 		eventsHelper.updateServerCount(Client.User.id, Client.Guilds.length, auth.abalToken);
 	}, 1800000);
