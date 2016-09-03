@@ -2,6 +2,7 @@
 process.title = "HaruBot v" + require('./package.json').version;
 
 const Discordie = require("discordie");
+const auth = require("./auth.json");
 const authToken = require("./auth.json").token;
 
 /**
