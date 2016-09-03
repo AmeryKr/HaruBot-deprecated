@@ -75,5 +75,5 @@ Client.Dispatcher.on(Events.GUILD_BAN_REMOVE, e => {
 if (auth.abalToken) {
 	setInterval(() => {
 		eventsHelper.updateServerCount(Client.User.id, Client.Guilds.length, auth.abalToken);
-	}, 2000000);
+	}, 1800000);
 }
