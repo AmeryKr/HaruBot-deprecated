@@ -11,7 +11,7 @@ commandsInModule.ping = {
 	cooldown: 5, levelReq: 0,
 	exec: function (Client, msg, args) {
 		let msgDate = new Date(msg.timestamp);
-		
+
 		msg.reply('*pong!*').then((bm, error) => {
 			let botMessageDate = new Date(bm.timestamp);
 			let delay = new Date(botMessageDate - msgDate);
@@ -33,7 +33,7 @@ commandsInModule.info = {
 
 		msg.reply("hi! I'm **" + Client.User.username + "**!\nI'm currently in **" + Client.Guilds.length + "** servers, having tons of fun and splashing water on **" + Client.Users.length +
 		"** users >:D I'm also looking at **" + Client.Channels.length + "** channels! I've been up for " + uptimeString + ".\n" +
-		"I'm also **open source**! My GitHub link: http://github.com/AmeryKr/HaruBot");
+		"I'm also **open source**! My GitHub link: <http://github.com/AmeryKr/HaruBot>");
 	}
 }
 

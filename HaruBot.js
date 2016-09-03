@@ -31,7 +31,7 @@ Client.Dispatcher.on(Events.GATEWAY_READY, e => {
 });
 
 Client.Dispatcher.on(Events.MESSAGE_CREATE, e => {
-	messageHelper.messageHelper(Client, e.message);
+	messageHelper.messageHandler(Client, e.message);
 });
 
 /**
@@ -70,11 +70,15 @@ Client.Dispatcher.on(Events.GUILD_BAN_REMOVE, e => {
 	guildEventsHelper.handleUnban(e.guild, e.user);
 });
 
+Client.Dispatcher.on(Events.PRESENCE_MEMBER_INFO_UPDATE, e => {
+	eventsHelper.handlePresenceUpdate(Client, e.old, e.new);
+});
+
 /**
  * Update server count on Abal's website
  */
-if (auth.abalToken) {
-	/* Temporary, for testing */
+/*if (auth.abalToken) {
+	/* Temporary, for testing
 	setTimeout(() => {
 		eventsHelper.updateServerCount(Client.User.id, Client.Guilds.length, auth.abalToken);
 	}, 10000);
@@ -82,3 +86,4 @@ if (auth.abalToken) {
 		eventsHelper.updateServerCount(Client.User.id, Client.Guilds.length, auth.abalToken);
 	}, 1800000);
 }
+*/

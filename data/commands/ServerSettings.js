@@ -1,6 +1,7 @@
 "use strict";
 let commandsInModule = [];
 const ServerSettings = require("../../databases/helpers/serversettings.js");
+const auth = require("../../auth.json");
 
 commandsInModule.prefix = {
 	name: 'prefix', module: 'Server Settings',
@@ -90,22 +91,28 @@ commandsInModule.log = {
 
 commandsInModule.ignore = {
 	name: 'ignore', module: 'Server Settings',
-	help: 'WARNING: NOT IMPLEMENTED! Makes the bot ignore the channel in which the command was typed in, or a specific user with an @mention',
-	usage: '(@user) - Optional. If no user is mentioned, the current channel will be ignored',
+	help: 'Makes the bot ignore the channel in which the command was typed in, or a specific user with an @mention',
+	usage: '[@user] - Optional. If no user is mentioned, the current channel will be ignored',
 	cooldown: 5, levelReq: 3,
 	exec: function (Client, msg, args) {
-		if (msg.mentions.length === 1) {
-			let user = msg.mentions[0];
-
-			ServerSettings.updateUserIgnore(msg.guild, "ignore", user.id).then(r => {
-				if (r === 'Ok') {
-					msg.channel.sendMessage(":white_check_mark: I am now ignoring user **" + user.username + "**");
+		if (msg.mentions.length > 0) {
+			msg.mentions.map(k => {
+				if (auth.botOwner.indexOf(k.id) > -1) {
+					msg.channel.sendMessage(":no_entry_sign: Can't ignore a bot owner!");
+				} else if (msg.guild.owner_id === k.id) {
+					msg.channel.sendMessage(":no_entry_sign: Can't ignore the server owner!");
+				} else {
+					ServerSettings.updateUserIgnore(msg.guild, "ignore", k.id).then(r => {
+						if (r === 'Ok') {
+							msg.channel.sendMessage(":white_check_mark: I am now ignoring user **" + k.username + "**");
+						}
+					}).catch(e => {
+						console.log(e);
+						msg.channel.sendMessage(":interrobang: An error has occurred while trying to run this command! Error:```xl\n" + e + "```");
+					});
 				}
-			}).catch(e => {
-				console.log(e);
-				msg.channel.sendMessage(":interrobang: An error has occurred while trying to run this command! Error:```xl\n" + e + "```");
-			})
-		} else if (msg.mentions.length < 1) {
+			});
+		} else if (msg.mentions.length === 0) {
 			ServerSettings.updateChannelIgnore(msg.guild, "ignore", msg.channel.id).then(r => {
 				if (r === 'Ok') {
 					msg.channel.sendMessage(":white_check_mark: I am now ignoring this channel. (**" + msg.channel.name + "**)");
@@ -114,8 +121,42 @@ commandsInModule.ignore = {
 				console.log(e);
 				msg.channel.sendMessage(":interrobang: An error has occurred while trying to run this command! Error:```xl\n" + e + "```");
 			});
+		}
+	}
+}
+
+commandsInModule.unignore = {
+	name: 'unignore', module: 'Server Settings',
+	help: 'Makes the bot stop ignoring the channel in which the command was typed in, or a specific user with an @mention',
+	usage: '[@user] - Optional. If no user is mentioned, the current channel will be unignored',
+	cooldown: 5, levelReq: 3,
+	exec: function (Client, msg, args) {
+		if (msg.mentions.length > 0) {
+			msg.mentions.map(k => {
+				ServerSettings.checkUserIgnore(msg.guild, k.id).then(isIgnored => {
+					if (isIgnored) {
+						ServerSettings.updateUserIgnore(msg.guild, "unignore", k.id).then(res => {
+							if (res === "Ok") {
+								msg.channel.sendMessage(":white_check_mark: User **" + k.username + "** is no longer being ignored.");
+							}
+						});
+					} else {
+						msg.channel.sendMessage(":warning: User **" + k.username + "** wasn't ignored to begin with!");
+					}
+				});
+			});
 		} else {
-			msg.channel.sendMessage(":warning: Only one user mention at a time is allowed.");
+			ServerSettings.checkChannelIgnore(msg.guild, msg.channel.id).then(isIgnored => {
+				if (isIgnored) {
+					ServerSettings.updateChannelIgnore(msg.guild, "unignore", msg.channel.id).then(res => {
+						if (res === "Ok") {
+							msg.channel.sendMessage(":white_check_mark: This channel isn't being ignored anymore.");
+						}
+					});
+				} else {
+					msg.channel.sendMessage(":warning: This channel wasn't ignored to begin with!");
+				}
+			});
 		}
 	}
 }

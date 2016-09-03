@@ -9,11 +9,35 @@ const auth = require('../auth.json');
 let cooldownHelper = require("./cooldown.js");
 
 /**
+ * Checks for ignored channels or users, then proceeds to handle the command.
+ * @arg {Discordie} Client - the current Discordie Client
+ * @arg {IMessage} msg - The message interface.
+ */
+exports.messageHandler = function (Client, msg) {
+	/* Check db for channel ignore */
+	serverSettingsHelper.checkChannelIgnore(msg.guild, msg.channel.id).then(isChannelIgnored => {
+		if (!isChannelIgnored) {
+			serverSettingsHelper.checkUserIgnore(msg.guild, msg.author.id).then(isUserIgnored => {
+				if (!isUserIgnored) {
+					messageHelper(Client, msg);
+				}
+			});
+		} else {
+			serverSettingsHelper.checkUserIgnore(msg.guild, msg.author.id).then(isUserIgnored => {
+				if (!isUserIgnored) {
+					handleUnignoreCommand(Client, msg);
+				}
+			});
+		}
+	}) ;
+}
+
+/**
  * Handles message events for commands.
  * @arg {Discordie} Client - the current Discordie Client
  * @arg {IMessage} msg - The message interface.
  */
-exports.messageHelper = function (Client, msg) {
+let messageHelper = function (Client, msg) {
 	/* Check db for custom prefix */
 	let prefix;
 	serverSettingsHelper.checkForCustomPrefix(msg).then(pref => {
@@ -87,6 +111,41 @@ exports.messageHelper = function (Client, msg) {
 					msg.channel.sendMessage("Sorry, this command cannot be used in DMs.");
 				}
 			}
+		}
+	});
+}
+
+
+let handleUnignoreCommand = function (Client, msg) {
+	/* Check db for custom prefix */
+	let prefix;
+	serverSettingsHelper.checkForCustomPrefix(msg).then(pref => {
+		prefix = pref;
+
+		if (msg.content.indexOf(prefix) !== 0) return;
+		if (msg.mentions.length > 0) return;
+
+		let cmdText = msg.content.split(" ")[0].substr(prefix.length).toLowerCase();
+		let args = msg.content.substr(prefix.length + cmdText.length + 1);
+
+		if (cmdText === "unignore") {
+			if (commands[cmdText]) {
+				let command = commands[cmdText];
+
+				permissionsHelper.checkPermissions(msg, msg.author, msg.author.memberOf(msg.guild).roles).then(level => {
+					if (level >= command.levelReq) {
+						try {
+							logHelper.command(msg.guild.name, msg.author.username, cmdText, args);
+							command.exec(Client, msg, args);
+						} catch (er) {
+							msg.channel.sendMessage(":interrobang: There was an error while executing that command. Error:\n```xl\n" + er + "```");
+							console.log(er);
+						}
+					}
+				});
+			}
+		} else {
+			return;
 		}
 	});
 }

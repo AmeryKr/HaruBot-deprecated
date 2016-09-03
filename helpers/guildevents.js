@@ -1,8 +1,8 @@
 "use strict";
 const chalk = require("chalk");
 const fs = require("fs");
-let serverSettings = require("../databases/helpers/serversettings.js");
-let permissions = require("../databases/helpers/permissions.js");
+const serverSettings = require("../databases/helpers/serversettings.js");
+const permissions = require("../databases/helpers/permissions.js");
 
 /**
  * Handles the guild create event
@@ -94,7 +94,7 @@ exports.handleMemberRemove = function (guild, user) {
 
 			logChannel.sendMessage(":heavy_minus_sign: **A member has been removed the server**\n```xl\n"
 			+ "Username: \"" + user.username + "#" + user.discriminator + "\"\n"
-			+ "User ID: " + user.id + "```\n" + 
+			+ "User ID: " + user.id + "```\n" +
 			"**NOTE**: this might mean the user got kicked or they left the server on their own.");
 		}
 	});

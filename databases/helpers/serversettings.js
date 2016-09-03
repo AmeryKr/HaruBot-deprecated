@@ -102,6 +102,69 @@ exports.checkColors = function (guild) {
 		});
 	});
 }
+/**
+ * Checks if a channel is ignored
+ * @arg {IGuild} guild - Guild interface
+ * @arg {String} channelID - ID of the channel
+ */
+exports.checkChannelIgnore = function (guild, channelID) {
+	return new Promise ((resolve, reject) => {
+		serverSettings.find({ _id: guild.id }, (err, docs) => {
+			if (err) {
+				console.log(err);
+				return reject(err);
+			}
+
+			if (docs.length > 0) {
+				if(docs[0].ignoredChannels.indexOf(channelID) > -1) {
+					return resolve(true);
+				} else {
+					return resolve(false);
+				}
+			}
+		});
+	});
+}
+
+exports.checkChannelIgnoreNP = function (guild, channelID) {
+	serverSettings.find({ _id: guild.id }, (err, docs) => {
+		if (err) {
+			console.log(err);
+		}
+
+		if (docs.length > 0) {
+			if(docs[0].ignoredChannels.indexOf(channelID) > -1) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	});
+}
+
+/**
+ * Checks if a user is ignored
+ * @arg {IGuild} guild - Guild interface
+ * @arg {String} userID - ID of the user
+ */
+exports.checkUserIgnore = function (guild, userID) {
+	return new Promise ((resolve, reject) => {
+		serverSettings.find({ _id: guild.id }, (err, docs) => {
+			if (err) {
+				console.log(err);
+				return reject(err);
+			}
+
+			if (docs.length > 0) {
+				if (docs[0].ignoredUsers.indexOf(userID) > -1) {
+					return resolve(true);
+				} else {
+					return resolve(false);
+				}
+			}
+		});
+	});
+}
 
 /**
  * Enables/disables custom colors

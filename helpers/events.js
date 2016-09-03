@@ -1,5 +1,6 @@
 'use strict';
 const superagent = require("superagent");
+const serverSettings = require("../databases/helpers/serversettings.js");
 
 /**
  * Sends a request to update the bot's server count on bots.discord.pw
@@ -13,6 +14,38 @@ exports.updateServerCount = function (clientID, guilds, token) {
 		console.log("Updated bot server count in bots.discord.pw.");
 		if (er) {
 			console.log(er);
+		}
+	});
+}
+
+exports.handlePresenceUpdate = function (Client, oldUser, newUser) {
+	let botGuilds = Client.Guilds;
+	let user = Client.Users.get(newUser.id);
+
+	botGuilds.forEach(currentGuild => {
+		if (user.memberOf(currentGuild)) {
+			serverSettings.checkLogging(currentGuild).then(res => {
+				if (res !== "DISABLED") {
+					let logChannel = currentGuild.textChannels.find(k => k.id === res);
+					let changesString = "";
+
+					/* If there's a username difference */
+					if (newUser.username !== oldUser.username) {
+						changesString += "Old Username: \"" + oldUser.username + "\"\n";
+						changesString += "New Username: \"" + newUser.username + "\"\n";
+					}
+
+					/* If there's a discriminator difference */
+					if (newUser.discriminator !== oldUser.discriminator) {
+						changesString += "Old Discrim.: " + oldUser.discriminator + "\n";
+						changesString += "New Discrim.: " + newUser.discriminator + "\n";
+					}
+
+					logChannel.sendMessage(":up: **A member has been updated**! Details:\n```xl\n" + changesString + "```");
+				}
+			}).catch(e => {
+				console.log(e);
+			});
 		}
 	});
 }

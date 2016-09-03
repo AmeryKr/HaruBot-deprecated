@@ -24,7 +24,9 @@ commandsInModule.prune = {
 
 		msg.channel.fetchMessages(args, msg).then((result) => {
 			client.Messages.deleteMessages(result.messages);
-			msg.channel.sendMessage(':white_check_mark: Succesfully deleted **' + args + '** messages from this channel.');
+			msg.channel.sendMessage(':white_check_mark: Succesfully deleted **' + args + '** messages from this channel.').then(botMessage => {
+				setTimeout(() => { botMessage.delete(); }, 6000);
+			});
 			msg.delete();
 		}).catch(e => {
 			console.log(e);
@@ -51,7 +53,9 @@ commandsInModule.clean = {
 		msg.channel.fetchMessages(40).then((result) => {
 			let messagesToDelete = result.messages.filter(item => item.author.id === client.User.id);
 			client.Messages.deleteMessages(messagesToDelete);
-			msg.channel.sendMessage(':white_check_mark: Succesfully deleted **' + messagesToDelete.length + '** bot messages from this channel.');
+			msg.channel.sendMessage(':white_check_mark: Succesfully deleted **' + messagesToDelete.length + '** bot messages from this channel.').then(botMessage => {
+				setTimeout(() => { botMessage.delete(); }, 6000);
+			});
 		});
 	}
 }
