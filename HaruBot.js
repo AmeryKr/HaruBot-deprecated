@@ -67,3 +67,12 @@ Client.Dispatcher.on(Events.GUILD_BAN_ADD, e => {
 Client.Dispatcher.on(Events.GUILD_BAN_REMOVE, e => {
 	guildEventsHelper.handleUnban(e.guild, e.user);
 });
+
+/**
+ * Update server count on Abal's website
+ */
+if (auth.abalToken) {
+	setInterval(() => {
+		eventsHelper.updateServerCount(Client.User.id, Client.Guilds.length, auth.abalToken);
+	}, 2000000);
+}
