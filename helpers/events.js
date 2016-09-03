@@ -8,8 +8,8 @@ const superagent = require("superagent");
  * @arg {String} token - Abal token ;)
  */
 exports.updateServerCount = function (clientID, guilds, token) {
-	superagent.post(`https://bots.discord.pw/api/bots/${ID}/stats`).set("Authorization", token).type("application/json")
-	.send({guilds}).end(er => {
+	superagent.post(`https://bots.discord.pw/api/bots/${clientID}/stats`).set("Authorization", token).type("application/json")
+	.send({ "server_count": guilds}).end(er => {
 		console.log("Updated bot server count in bots.discord.pw.");
 		if (er) {
 			console.log(er);
