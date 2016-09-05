@@ -77,8 +77,7 @@ Client.Dispatcher.on(Events.PRESENCE_MEMBER_INFO_UPDATE, e => {
 /**
  * Update server count on Abal's website
  */
-/*if (auth.abalToken) {
-	/* Temporary, for testing
+if (auth.abalToken) {
 	setTimeout(() => {
 		eventsHelper.updateServerCount(Client.User.id, Client.Guilds.length, auth.abalToken);
 	}, 10000);
@@ -86,4 +85,3 @@ Client.Dispatcher.on(Events.PRESENCE_MEMBER_INFO_UPDATE, e => {
 		eventsHelper.updateServerCount(Client.User.id, Client.Guilds.length, auth.abalToken);
 	}, 1800000);
 }
-*/

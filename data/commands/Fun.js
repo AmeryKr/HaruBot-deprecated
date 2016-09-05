@@ -238,6 +238,7 @@ commandsInModule.color = {
 				}, 1000);
 			} else if (r === "DISABLED") {
 				msg.channel.sendMessage(":raised_hand::skin-tone-1: Color roles are disabled on this server!");
+				cooldowns.resetCooldown("color", msg.guild.id, msg.author.id);
 			}
 		}).catch(e => {
 			console.log(er);

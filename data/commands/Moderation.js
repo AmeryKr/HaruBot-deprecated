@@ -150,7 +150,7 @@ commandsInModule.kick = {
 	name: 'kick', module: 'Moderation',
 	help: 'Kicks a user or a set of users.',
 	usage: '[@user1] [@user2]...',
-	cooldown: 5, levelReq: 3,
+	cooldown: 5, levelReq: 2,
 	exec: function (Client, msg, args) {
 		if (!msg.author.permissionsFor(msg.guild).General.KICK_MEMBERS) {
 			msg.reply(':pensive: You do not have permission to kick members in this server!');
@@ -184,7 +184,7 @@ commandsInModule.ban = {
 	name: 'ban', module: 'Moderation',
 	help: 'Bans a user or a set of users. At the end of the mentions you can specify the days to delete messages.',
 	usage: '[@user1] [@user2]... [days (0, 1, or 7)]',
-	cooldown: 5, levelReq: 3,
+	cooldown: 5, levelReq: 2,
 	exec: function (Client, msg, args) {
 		if (!msg.author.permissionsFor(msg.guild).General.BAN_MEMBERS) {
 			msg.reply(':pensive: You do not have permission to ban members in this server!');
@@ -216,6 +216,47 @@ commandsInModule.ban = {
 			});
 		} else {
 			msg.reply("last parameter has to be either 0, 1 or 7.");
+		}
+	}
+}
+
+commandsInModule.search = {
+	name: 'search', module: 'Moderation',
+	help: 'Searches in the last 100 messages of the channel for a specific string.',
+	usage: '[channel] [text] (must be lowercase to work!)',
+	cooldown: 5, levelReq: 2,
+	exec: function (Client, msg, args) {
+		if (!args) {
+			msg.channel.sendMessage(":warning: You didn't specify a search text.");
+		} else {
+			let arg = args.split(" ");
+			let queryChannel, query;
+
+			if (/<#\d{17,}>/.test(arg[0])) {
+				queryChannel = Client.Channels.find(k => k.id === arg[0].replace(/<#|>/g, ""));
+				query = args.substring(arg[0].length + 1);
+			} else {
+				queryChannel = msg.channel;
+				query = args;
+			}
+
+			queryChannel.fetchMessages(100).then(obj => {
+				let msgArray = [];
+				obj.messages.map(k => {
+					if (k.content.toLowerCase().indexOf(query) > -1) {
+						if (!k.author.bot) {
+							let msgDate = new Date(k.timestamp);
+
+							msgArray.push("`[" + msgDate.toUTCString() + "]` [**" + k.author.username + "#" + k.author.discriminator + "**] " + "" +
+							k.content + "");
+						}
+					}
+				});
+
+				//TODO: Check for case in which the message is longer than 2000 characters.
+
+				msg.channel.sendMessage(msgArray.join("\n"));
+			});
 		}
 	}
 }
