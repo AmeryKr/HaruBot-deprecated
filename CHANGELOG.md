@@ -1,5 +1,10 @@
 # HaruBot - Changelog
 
+#### v0.5.1
+* Added version number and changelog link to info command
+* Fixed the bot not logging avatar changes
+* Fixed uptime display on info command
+
 ### v0.5.0 - Wh- How?!
 * Implementing new versioning for the bot, now it's a little more organized
 * Added a moderation command: search

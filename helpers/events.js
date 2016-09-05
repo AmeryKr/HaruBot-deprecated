@@ -22,6 +22,9 @@ exports.handlePresenceUpdate = function (Client, oldUser, newUser) {
 	let botGuilds = Client.Guilds;
 	let user = Client.Users.get(newUser.id);
 
+	console.log(oldUser)
+	console.log(newUser)
+
 	botGuilds.forEach(currentGuild => {
 		if (user.memberOf(currentGuild)) {
 			serverSettings.checkLogging(currentGuild).then(res => {
@@ -33,12 +36,22 @@ exports.handlePresenceUpdate = function (Client, oldUser, newUser) {
 					if (newUser.username !== oldUser.username) {
 						changesString += "Old Username: \"" + oldUser.username + "\"\n";
 						changesString += "New Username: \"" + newUser.username + "\"\n";
+					} else {
+						changesString += "Username: \"" + oldUser.username + "\"\n";
 					}
 
 					/* If there's a discriminator difference */
 					if (newUser.discriminator !== oldUser.discriminator) {
 						changesString += "Old Discrim.: " + oldUser.discriminator + "\n";
 						changesString += "New Discrim.: " + newUser.discriminator + "\n";
+					} else {
+						changesString += "Discriminator: " + oldUser.discriminator + "\n";
+					}
+
+					/* If there's an avatar difference */
+					if (newUser.avatar !== oldUser.avatar) {
+						changesString += "Old Avatar: \"http://cdn.discordapp.com/avatars/" + oldUser.id + "/" + oldUser.avatar + ".jpg\"\n";
+						changesString += "New Avatar: \"http://cdn.discordapp.com/avatars/" + newUser.id + "/" + newUser.avatar + ".jpg\"\n";
 					}
 
 					logChannel.sendMessage(":up: **A member has been updated**! Details:\n```xl\n" + changesString + "```");

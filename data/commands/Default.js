@@ -33,6 +33,7 @@ commandsInModule.info = {
 
 		msg.reply("hi! I'm **" + Client.User.username + "**!\nI'm currently in **" + Client.Guilds.length + "** servers, having tons of fun and splashing water on **" + Client.Users.length +
 		"** users >:D I'm also looking at **" + Client.Channels.length + "** channels! I've been up for " + uptimeString + ".\n" +
+		"My current version is: **v" + require("../../package.json").version + "**. My changelog can be viewed here: <http://goo.gl/wDqQeb>\n" +
 		"I'm also **open source**! My GitHub link: <http://github.com/AmeryKr/HaruBot>");
 	}
 }
@@ -167,16 +168,35 @@ function correctDate (stringDate) {
 	return dateUNIX;
 }
 
+/*
 function formatUptime (uptime) {
 	let result = "";
 
 	let seconds = uptime.getUTCSeconds();
 	let minutes = uptime.getUTCMinutes();
 	let hours = uptime.getUTCHours();
-	let days = parseInt(uptime.getUTCHours() / 24);
-	hours -= days * 24;
+	let days = Math.floor(hours / 24);
+	console.log(days)
+	hours = hours - days * 24;
 
-	result += (days > 0) ? ("**" + days + "** days ") : "";
+	result += (days >= 0) ? ("**" + days + "** days ") : "";
+	result += (hours > 0) ? ("**" + hours + "** hours ") : "";
+	result += (minutes > 0) ? ("**" + minutes + "** minutes ") : "";
+	result += (seconds > 0) ? ("**" + seconds + "** seconds ") : "";
+
+	return result;
+}
+*/
+
+function formatUptime (uptime) {
+	let result = "";
+
+	let seconds = Math.floor((uptime.getTime() / (1000)) % 60);
+	let minutes = Math.floor((uptime.getTime() / (1000 * 60)) % 60);
+	let hours = Math.floor((uptime.getTime() / (1000 * 60 * 60)) % 24);
+	let days = Math.floor(uptime.getTime() / (1000 * 60 * 60 * 24));
+
+	result += (days >= 0) ? ("**" + days + "** days ") : "";
 	result += (hours > 0) ? ("**" + hours + "** hours ") : "";
 	result += (minutes > 0) ? ("**" + minutes + "** minutes ") : "";
 	result += (seconds > 0) ? ("**" + seconds + "** seconds ") : "";
