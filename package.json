@@ -1,6 +1,6 @@
 {
   "name": "harubot",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A small Discord bot made with love :3",
   "main": "HaruBot.js",
   "repository": {
